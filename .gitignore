@@ -5,3 +5,4 @@ settings.py
 *.json
 *~
 media/temp
+local_settings.py
