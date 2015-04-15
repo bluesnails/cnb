@@ -4,16 +4,45 @@
 	<meta charset="utf-8">
 	<title>Blue Snails {% block extra_title %}{% endblock %}</title>
 	<meta name="description" content="This is not drill">
-	<meta name="author" content="vij">
+	<meta name="author" content="vijju">
 	<style type="text/css">
-        	body {
-	            padding-top: 60px;
-        	}
+        	html, body {
+                height: 100%;
+                margin: 0;
+   	            padding-top: 60px;
+            }
+            div {
+                height: 100%;
+                background-color: white;
+                float: left;
+            }
+            #left {
+                width:220px;
+                margin: 5px;
+            }
+            #center {
+                margin: 5px 0;
+                width: calc(100% - 460px);
+            }
+            #right {
+                margin: 5px;
+                width: 220px;
+            }
 	</style>
 </head>
 <body>
-{% block content %}
 
-{% endblock %}
+<div id="left">
+</div>
+
+<div id="center">
+<center>
+{% block content %}{% endblock %}
+</center>
+</div>
+
+<div id="right">
+</div>
+
 </body>
 </html>

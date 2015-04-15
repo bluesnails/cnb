@@ -1,18 +1,11 @@
-{% extend "base.html" %}
+{% extends "base.html" %}
 
 {% block content %}
 
-<div id="left"></div>
-
-<div id="center">
-	<form action="/add_ques/" method="POST">
-	</form>
-		
-
-</div>
-
-
-<div id="right"></div>
+<form action="{url "pro:add_ques" }" method="POST">
+{% csrf_token %}
+    <input type="text" id="ques_sub"></input>
+    <input type="textarea" id="ques_text"></input>
+</form>
 
 {% endblock %}
-

@@ -1,42 +1,53 @@
 from django.db import models
 
-# Create your models here.
+from django.contrib.auth.models import User
 
-GS_SUBJECTS = (
-	('ECO': 'Economics'),
-	('HIS': 'History'),
-	('GEO': 'Geography'),
-	('CLR': 'Culture and Arts'),
-	('ENV': 'Environment and Ecology')
-	('SCI': 'Science and Technology'),
-	('CRN': 'Current Affairs'),
-)
+# allow user to create quiz
+class quiz(models.Model):
 
-BLOOM_TAG = (
-	('KNO': 'Knowledge'),
-	('COM': 'Comprehension'),
-	('APP': 'Application'),
-)
+	quiz_id = models.AutoField(primary_key=True)
+	quiz_title = models.CharField(max_length=32, blank=False)
+	quiz_doc = models.DateField(auto_now_add=True)
 
-QUES_TYPES = (
-	('0': 'Matching'),
-	('1': 'Single Choice Correct'),
-	('2': 'Two Choices Correct'),
-	('3': 'Three Choices Correct'),
-	('4': 'Four Choices Correct'),
-)
+	def __unicode__(self):
+		return self.quiz_title	
 
 class question(models.Model):
 
+	GS_SUBJECTS = (
+		('ECO', 'Economics'),
+		('HIS', 'History'),
+		('GEO', 'Geography'),
+		('CLR', 'Culture and Arts'),
+		('ENV', 'Environment and Ecology'),
+		('SCI', 'Science and Technology'),
+		('CRN', 'Current Affairs'),
+	)
+
+	BLOOM_TAG = (
+		('KNO', 'Knowledge'),
+		('COM', 'Comprehension'),
+		('APP', 'Application'),
+	)
+
+	QUES_TYPES = (
+		('0', 'Matching'),
+		('1', 'Single Choice Correct'),
+		('2', 'Two Choices Correct'),
+		('3', 'Three Choices Correct'),
+		('4', 'Four Choices Correct'),
+	)
+
 	ques_id = models.AutoField(primary_key=True) 
-	ques_text = models.TextField(max_length=1024)
+	ques_text = models.TextField(max_length=1024, blank=False)				
 	ques_author = models.ForeignKey('author')
-	ques_created = models.DateField(auto_add_now=True)
+	ques_created = models.DateField(auto_now_add=True)
 	ques_dscore = models.IntegerField()
 	ques_bloom = models.CharField(max_length=3, choices=BLOOM_TAG)
 	ques_subject = models.CharField(max_length=3, choices=GS_SUBJECTS)
 	ques_type = models.CharField(max_length=1, choices=QUES_TYPES)
 	ques_flags = models.CharField(max_length=16)
+#	ques_quiz = models.ManyToManyField('quiz')
 
 	def __unicode__(self):
 		return self.ques_text
@@ -44,49 +55,45 @@ class question(models.Model):
 class choice(models.Model):
 
 	choice_id = models.AutoField(primary_key=True)
-	choice_text = models.CharField(max_length=128)
+	choice_text = models.CharField(max_length=256, blank=False)
 	choice_ques = models.ForeignKey('question')
 	choice_ans = models.BooleanField(default=False)
-	choice_mtags = models.CharField(max_length=32)
+	choice_tags = models.CharField(max_length=32)
 
 	def __unicode__(self):
 		return self.choice_text
 
+class answer(models.Model):
+
+	answer_id = models.AutoField(primary_key=True)
+	answer_text = models.TextField(max_length=1024)
+	answer_ques = models.ForeignKey('question')
+
 class author(models.Model):
+
+	user = models.OneToOneField(User)
+	domain = models.CharField(max_length=32)
+
+	def __unicode__(self):
+		return self.user
+
+
+# a table for storing all the tags
+class tags(models.Model):
+
+	tags_id = models.AutoField(primary_key=True)
+	tags_text = models.CharField(max_length=16)
 	
-	auth_id = models.AutoField(primary_key=True)	
-	auth_username = models.CharField(max_length=32)
-	auth_doj = models.DateField(auto_add_now=True)
-	auth_org = models.CharField(max_length=32)
-	auth_email = models.EmailField()
-
 	def __unicode__(self):
-		return self.author_username
+		return self.tags_text
 
-class author_tags(models.Model):
-
-	atags_id = models.AutoField(primary_key=True)
-	atags_text = models.CharField(max_length=16)
+# table that connects tags with question attached to the tag
+# from all the research on the web, it can be infered that
+# 3NF tagging (Toxi Solution) is the best way to go
+# good for inserts but slow on selects
+class tagcon(models.Model):
 	
-	def __unicode__(self):
-		return self.atags_text
+	tagcon_id = models.AutoField(primary_key=True)
+	tagcon_tags = models.ForeignKey('tags')
+	tagcon_ques = models.ForeignKey('question')
 
-class acon(models.Model):
-
-	acon_id = models.AutoField(primary_key=True)
-	acon_atag = models.ForeignKey('author_tags')
-	acon_ques = models.ForeignKey('question')
-
-class machine_tags(models.Model):
-
-	mtags_id = models.AutoField(primary_key=True)
-	mtags_text = models.CharField(max_length=16)
-
-	def __unicode__(self):
-		return self.mtags_text
-
-class mcon(models.Model):
-
-	mcon_id = models.AutoField(primary_key=True)
-	mcon_mtag = models.ForeignKey('machcine_tags')
-	mcon_ques = models.ForeignKey('qustion')
