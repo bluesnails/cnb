@@ -2,10 +2,80 @@
 
 {% block content %}
 
-<form action="{url "pro:add_ques" }" method="POST">
+<form action="{% url 'pro:add_ques' %}" method="POST">
 {% csrf_token %}
-    <input type="text" id="ques_sub"></input>
-    <input type="textarea" id="ques_text"></input>
+    <div style="float: left;">
+	<table>
+		<tr>
+			<td>{{ form.ques_text }}</td>
+		</tr>
+		<tr>
+			<td>{{ form.ques_ch1 }}</td>
+		</tr>
+		<tr>
+			<td>{{ form.ques_ch2 }}</td>
+		</tr>
+		<tr>
+			<td>{{ form.ques_ch3 }}</td>
+		</tr>
+		<tr>
+			<td>{{ form.ques_ch4 }}</td>
+		</tr>
+	</table>
+    </div>
+    
+    
+    <div style="float: left;">
+	<table>
+		<tr>	
+			<td><select name="ques_sub">
+			{% for choice in form.ques_sub.field.choices %}
+				<option value="{{choice.0}}">{{choice.1}}</option>
+			{% endfor %}
+			</select></td>
+		</tr>
+		<tr><td></td></tr>
+		<tr><td></td></tr>
+		<tr>
+			<td><select name="ques_type">
+			{% for choice in form.ques_type.field.choices %}
+				<option value="{{choice.0}}">{{choice.1}}</option>
+			{% endfor %}
+			</select></td>
+		</tr>
+		<tr><td></td></tr>
+		<tr><td></td></tr>
+		<tr>
+			<td><select name="ques_bloom">
+			{% for choice in form.ques_bloom.field.choices %}
+				<option value="{{choice.0}}">{{choice.1}}</option>
+			{% endfor %}
+			</select></td>
+		</tr>
+		<tr><td></td></tr>
+		<tr><td></td></tr>
+
+		<tr><td>{{ form.ques_tags }}</td></tr>
+		<tr><td></td></tr>
+		<tr><td></td></tr>
+		<tr>
+			<td><select name="ques_ans">
+			{% for choice in form.ques_ans.field.choices %}
+				<option value="{{choice.0}}">{{choice.1}}</option>
+			{% endfor %}
+			</select></td>
+		</tr>
+		<tr><td></td></tr>
+		<tr><td></td></tr>
+		<tr><td>{{ form.ques_sol }}</td></tr>
+		<tr><td></td></tr>
+		<tr><td></td></tr>
+		<tr><td>{{ form.ques_dscore }}</td></tr>
+	
+	</table>
+	</div>
+
+<p><div><input type="submit" value="Add Question" /></div></p>
 </form>
 
 {% endblock %}

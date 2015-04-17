@@ -10,7 +10,7 @@ from django.http import HttpResponseRedirect
 from django.template import RequestContext
 
 from .models import question, choice, author, tags, tagcon, answer
-
+from .forms import QuestionForm
 
 def index(request):
 	return render(request, 'index.html')
@@ -30,41 +30,76 @@ def auth_staff(request):
 	# Return an 'invalid login' error message.
 		pass
 
-@login_required(login_url='/accounts/login/')
+#@login_required(login_url='/accounts/login/')
 def add_ques(request):
-	return render(request, 'addques.html')
-
-@login_required(login_url='/accounts/login/')
-def save_ques(request):
-
+	
 	if request.method=='POST':
-		qtext = request.POST['ques_text']
-		qtype = request.POST['ques_type']
-		qdscore = request.POST['ques_dscore']
-		qbtag = request.POST['ques_btag']
-		qsub  = request.POST['ques_sub']
+		form = QuestionForm(request.POST)
+		print "here here"
+
+		if form.is_valid():
+			print "we came here"
+			ques_text = form.cleaned_data['ques_text']
+			ques_type = form.cleaned_data['ques_type']
+			ques_dscore = form.cleaned_data['ques_dscore']
+			ques_bloom = form.cleaned_data['ques_bloom']
+			ques_sub  = form.cleaned_data['ques_sub']
+			ques_ans = form.cleaned_data['ques_ans']
+			
+			ch1 = form.cleaned_data['ques_ch1']
+			ch2 = form.cleaned_data['ques_ch2']
+			ch3 = form.cleaned_data['ques_ch3']
+			ch4 = form.cleaned_data['ques_ch4']
 		
-		ch1 = request.POST['ch1_text']
-		ch2 = request.POST['ch2_text']
-		ch3 = request.POST['ch3_text']
-		ch4 = request.POST['ch4_text']
+			print ques_text
+			print ques_dscore
+			print ques_bloom
+			print ques_ans
+			print ques_sub
+			print ques_type
 
-		# generate mtags
-		qatags = get_author_tags(request.POST['ques_atags'])
+	
+			ques_sol = form.cleaned_data['ques_sol']
 
-		Q = question(ques_text=qtext, ques_type=qtype, ques_dscore=qdscore, ques_bloom=qbtag, ques_subject=qsub)
-		ch1 = choice(choice_text=ch1_text, choice_ques=Q, choice_ans=ch1_ans)
-		ch2 = choice(choice_text=ch2_text, choice_ques=Q, choice_ans=ch2_ans)
-		ch3 = choice(choice_text=ch3_text, choice_ques=Q, choice_ans=ch3_ans)
-		ch4 = choice(choice_text=ch4_text, choice_ques=Q, choice_ans=ch4_ans)
+			ques_tags = form.cleaned_data['ques_tags'].split(',')
+			
+			Q = question(ques_text=ques_text, 
+			            ques_type=ques_type, 
+			            ques_dscore=ques_dscore, 
+			            ques_bloom=ques_bloom, 
+			            ques_subject=ques_sub,
+			     )
+			Q.save()
+			            
+			choice1 = choice(choice_text=ch1, choice_ques=Q)
+			choice1.save()
+			choice2 = choice(choice_text=ch2, choice_ques=Q)
+			choice2.save()
+			choice3 = choice(choice_text=ch3, choice_ques=Q)
+			choice3.save()
+			choice4 = choice(choice_text=ch4, choice_ques=Q)
+			choice4.save()		
 
-		Q.save()
-		ch1.save()
-		ch2.save()
-		ch3.save()
-		ch4.save()
+		        ans_choice_dict = {'ch1': choice1, 'ch2': choice2, 'ch3': choice3, 'ch4':choice4}
+			ans = answer(answer_text=ques_sol, answer_ques=Q, answer_choice=ans_choice[ch_ans])
+			ans.save()
+			
+			for tag in ques_tags:
+				tag = tag.strip()
+				t = tags(tags_text=tag)
+				t.save()
+				tcon = tagcon(tagcon_tags=t, tagcon_ques=Q)
+				tcon.save()
+		
+			print "we finally got here"	
+			return HttpResponseRedirect(reverse('.views.index'))
 
+		else:
+			print "form not valid"
+			print form.errors
 	else:
-		return HttpResponseRedirect(reverse('.views.add_ques'))
+		print "we shouldnt be here"
+		form = QuestionForm()
 
-	return render('saved.html', context_instance=RequestContext(request))
+	return render(request, 'addques.html', {'form':form})
+

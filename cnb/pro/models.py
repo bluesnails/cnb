@@ -12,40 +12,16 @@ class quiz(models.Model):
 	def __unicode__(self):
 		return self.quiz_title	
 
-class question(models.Model):
-
-	GS_SUBJECTS = (
-		('ECO', 'Economics'),
-		('HIS', 'History'),
-		('GEO', 'Geography'),
-		('CLR', 'Culture and Arts'),
-		('ENV', 'Environment and Ecology'),
-		('SCI', 'Science and Technology'),
-		('CRN', 'Current Affairs'),
-	)
-
-	BLOOM_TAG = (
-		('KNO', 'Knowledge'),
-		('COM', 'Comprehension'),
-		('APP', 'Application'),
-	)
-
-	QUES_TYPES = (
-		('0', 'Matching'),
-		('1', 'Single Choice Correct'),
-		('2', 'Two Choices Correct'),
-		('3', 'Three Choices Correct'),
-		('4', 'Four Choices Correct'),
-	)
+class question(models.Model):	
 
 	ques_id = models.AutoField(primary_key=True) 
-	ques_text = models.TextField(max_length=1024, blank=False)				
+	ques_text = models.TextField(max_length=1024, blank=False)
 	ques_author = models.ForeignKey('author')
 	ques_created = models.DateField(auto_now_add=True)
 	ques_dscore = models.IntegerField()
-	ques_bloom = models.CharField(max_length=3, choices=BLOOM_TAG)
-	ques_subject = models.CharField(max_length=3, choices=GS_SUBJECTS)
-	ques_type = models.CharField(max_length=1, choices=QUES_TYPES)
+	ques_bloom = models.CharField(max_length=3)
+	ques_subject = models.CharField(max_length=3)
+	ques_type = models.CharField(max_length=1)
 	ques_flags = models.CharField(max_length=16)
 #	ques_quiz = models.ManyToManyField('quiz')
 
@@ -57,7 +33,7 @@ class choice(models.Model):
 	choice_id = models.AutoField(primary_key=True)
 	choice_text = models.CharField(max_length=256, blank=False)
 	choice_ques = models.ForeignKey('question')
-	choice_ans = models.BooleanField(default=False)
+#	choice_ans = models.BooleanField(default=False)
 	choice_tags = models.CharField(max_length=32)
 
 	def __unicode__(self):
@@ -68,11 +44,13 @@ class answer(models.Model):
 	answer_id = models.AutoField(primary_key=True)
 	answer_text = models.TextField(max_length=1024)
 	answer_ques = models.ForeignKey('question')
+	answer_choice = models.ForeignKey('choice')
+	answer_tags = models.CharField(max_length=128)
 
 class author(models.Model):
 
 	user = models.OneToOneField(User)
-	domain = models.CharField(max_length=32)
+	domain = models.CharField(max_length=16)
 
 	def __unicode__(self):
 		return self.user
