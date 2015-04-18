@@ -68,6 +68,7 @@ def add_ques(request):
 			            ques_dscore=ques_dscore, 
 			            ques_bloom=ques_bloom, 
 			            ques_subject=ques_sub,
+				    ques_author=request.user,
 			     )
 			Q.save()
 			            
