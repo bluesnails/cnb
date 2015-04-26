@@ -23,7 +23,7 @@ class question(models.Model):
 	ques_subject = models.CharField(max_length=3)
 	ques_type = models.CharField(max_length=1)
 	ques_flags = models.CharField(max_length=16)
-#	ques_quiz = models.ManyToManyField('quiz')
+	ques_quiz = models.ManyToManyField('quiz')
 
 	def __unicode__(self):
 		return self.ques_text
@@ -53,7 +53,7 @@ class author(models.Model):
 	domain = models.CharField(max_length=16)
 
 	def __unicode__(self):
-		return self.user
+		return self.user.username
 
 
 # a table for storing all the tags

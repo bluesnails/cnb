@@ -14,6 +14,12 @@ from .forms import QuestionForm
 
 def index(request):
 	return render(request, 'index.html')
+	
+def about(request):
+    return render(request, 'about.html')
+
+def login_page(request):
+	return render(request, 'Registration/login.html')
 
 def auth_staff(request):
 	username = request.POST['username']
@@ -21,16 +27,16 @@ def auth_staff(request):
 	user = authenticate(username=username, password=password)
 	if user is not None:
 		if user.is_active:
-		    login(request, user)
+			login(request, user)
 		else:
 		    # Return a 'disabled account' error message
 			pass
-
 	else:
 	# Return an 'invalid login' error message.
 		pass
+		#	return HttpResponseRedirect(reverse('.views.login_page'))
 
-#@login_required(login_url='/accounts/login/')
+@login_required(login_url='/accounts/login/')
 def add_ques(request):
 	
 	if request.method=='POST':
@@ -68,7 +74,7 @@ def add_ques(request):
 			            ques_dscore=ques_dscore, 
 			            ques_bloom=ques_bloom, 
 			            ques_subject=ques_sub,
-				    ques_author=request.user,
+				    ques_author=author(user=request.user)
 			     )
 			Q.save()
 			            
@@ -81,8 +87,9 @@ def add_ques(request):
 			choice4 = choice(choice_text=ch4, choice_ques=Q)
 			choice4.save()		
 
+			ch_ans = form.cleaned_data['ques_ans']
 		        ans_choice_dict = {'ch1': choice1, 'ch2': choice2, 'ch3': choice3, 'ch4':choice4}
-			ans = answer(answer_text=ques_sol, answer_ques=Q, answer_choice=ans_choice[ch_ans])
+			ans = answer(answer_text=ques_sol, answer_ques=Q, answer_choice=ans_choice_dict[ch_ans])
 			ans.save()
 			
 			for tag in ques_tags:
